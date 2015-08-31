@@ -12,7 +12,10 @@
 ;; This package gets a random commit message from "whatthecommit.com" and adds it to your kill ring
 
 ;;; Code:
+
+;;;###autoload
 (defun what-the-commit ()
+  "Get a random commit message from whatthecommit.com"
   (interactive)
     (let ((url-request-method "GET"))
       (url-retrieve "http://whatthecommit.com/index.txt"
