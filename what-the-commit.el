@@ -15,11 +15,22 @@
 
 ;;;###autoload
 (defun what-the-commit ()
-  "Get a random commit message from whatthecommit.com"
+  "Get a random commit message from whatthecommit.com and adds it to the kill ring"
   (interactive)
     (let ((url-request-method "GET"))
       (url-retrieve "http://whatthecommit.com/index.txt"
-                    (lambda (status) (switch-to-buffer (current-buffer)) (goto-char (point-min)) (search-forward-regexp "^$") (delete-region (point) (point-min)) (buffer-string) (beginning-of-buffer) (kill-line) (mark-whole-buffer) (kill-region (point-min) (point-max)) (kill-buffer) (message "Commit message generated!")))))
+        (lambda (status)
+          (switch-to-buffer (current-buffer))
+          (goto-char (point-min))
+          (search-forward-regexp "^$")
+          (delete-region (point) (point-min))
+          (buffer-string)
+          (beginning-of-buffer)
+          (kill-line)
+          (mark-whole-buffer)
+          (kill-region (point-min) (point-max))
+          (kill-buffer)
+          (message "Commit message generated!")))))
 
 (provide 'what-the-commit)
 ;;; what-the-commit.el ends here
