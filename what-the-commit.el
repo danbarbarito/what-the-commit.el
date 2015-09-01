@@ -29,17 +29,36 @@
 
 (defvar url-http-end-of-headers)
 
+(defconst what-the-commit-url "http://whatthecommit.com/index.txt"
+  "URL from which to get commit messages.")
+
+(defun what-the-commit--extract-message ()
+  "Extract the commit message from the current buffer."
+  (goto-char (point-min))
+  (goto-char url-http-end-of-headers)
+  (forward-line 1)
+  (unwind-protect
+      (buffer-substring-no-properties (point) (point-max))
+    (kill-buffer)))
+
+;;;###autoload
+(defun what-the-commit-insert ()
+  "Insert a random message from whatthecommit.com at point."
+  (interactive)
+  (let* ((url-request-method "GET")
+         (message (with-current-buffer
+                      (url-retrieve-synchronously what-the-commit-url)
+                    (what-the-commit--extract-message))))
+    (insert message)))
+
 ;;;###autoload
 (defun what-the-commit ()
-  "Get a random commit message from whatthecommit.com and add it to the kill ring."
+  "Add a random commit message from whatthecommit.com to the kill ring."
   (interactive)
   (let ((url-request-method "GET"))
-    (url-retrieve "http://whatthecommit.com/index.txt"
-                  (lambda (status)
-                    (goto-char url-http-end-of-headers)
-                    (forward-line 1)
-                    (copy-region-as-kill (point) (point-max))
-                    (kill-buffer)
+    (url-retrieve what-the-commit-url
+                  (lambda (_status)
+                    (kill-new (what-the-commit--extract-message))
                     (message "Commit message generated!")))))
 
 (provide 'what-the-commit)
